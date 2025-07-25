@@ -1,0 +1,8 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:42:30 2025 as: /usr/lib/nmap/nmap --privileged --script ftp-vuln* -oN evidence/vulnerabilities/vulns_192_168_1_21.txt_ftp-vulnall 192.168.1.21
+Nmap scan report for moto-g23 (192.168.1.21)
+Host is up (0.0061s latency).
+All 1000 scanned ports on moto-g23 (192.168.1.21) are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: 26:33:F6:04:C9:B4 (Unknown)
+
+# Nmap done at Fri Jul 25 11:42:34 2025 -- 1 IP address (1 host up) scanned in 3.14 seconds

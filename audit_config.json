@@ -1,0 +1,38 @@
+{
+  "targets": {
+    "single_ip": "192.168.1.1",
+    "ip_range": "192.168.1.0/24",
+    "domain": "example.com",
+    "url": "https://example.com"
+  },
+  "scan_options": {
+    "port_range": "1-65535",
+    "top_ports": 1000,
+    "aggressive_scan": false,
+    "stealth_scan": true,
+    "service_detection": true,
+    "os_detection": true,
+    "vulnerability_scan": true,
+    "ssl_scan": true
+  },
+  "timing": {
+    "scan_delay": 0,
+    "timeout": 300,
+    "max_retries": 2,
+    "threads": 50
+  },
+  "wordlists": {
+    "directories": "/usr/share/wordlists/dirb/common.txt",
+    "subdomains": "/usr/share/wordlists/subdomains-top1million-5000.txt",
+    "passwords": "/usr/share/wordlists/rockyou.txt"
+  },
+  "output": {
+    "format": [
+      "json",
+      "html",
+      "txt"
+    ],
+    "detailed_reports": true,
+    "screenshots": false
+  }
+}

@@ -1,0 +1,9 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:41:15 2025 as: /usr/lib/nmap/nmap --privileged --script smb-vuln* -oN evidence/vulnerabilities/vulns_192_168_1_19.txt_smb-vulnall 192.168.1.19
+Nmap scan report for 192.168.1.19 (192.168.1.19)
+Host is up (0.018s latency).
+Not shown: 999 closed tcp ports (reset)
+PORT     STATE SERVICE
+9080/tcp open  glrpc
+MAC Address: FE:FD:FC:B6:8B:74 (Unknown)
+
+# Nmap done at Fri Jul 25 11:41:18 2025 -- 1 IP address (1 host up) scanned in 3.52 seconds

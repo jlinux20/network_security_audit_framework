@@ -1,0 +1,8 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:50:24 2025 as: /usr/lib/nmap/nmap --privileged --script ssh-* -oN evidence/vulnerabilities/vulns_192_168_1_20.txt_ssh-all 192.168.1.20
+Nmap scan report for plop (192.168.1.20)
+Host is up (0.020s latency).
+All 1000 scanned ports on plop (192.168.1.20) are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: 28:44:F4:FE:23:A0 (Unknown)
+
+# Nmap done at Fri Jul 25 11:50:26 2025 -- 1 IP address (1 host up) scanned in 1.94 seconds

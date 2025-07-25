@@ -1,0 +1,16 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:46:19 2025 as: /usr/lib/nmap/nmap --privileged --script vuln -oN evidence/vulnerabilities/vulns_192_168_1_29.txt_vuln 192.168.1.29
+Pre-scan script results:
+| broadcast-avahi-dos: 
+|   Discovered hosts:
+|     224.0.0.251
+|   After NULL UDP avahi packet DoS (CVE-2011-1002).
+|_  Hosts are all up (not vulnerable).
+Nmap scan report for 192.168.1.29 (192.168.1.29)
+Host is up (0.00092s latency).
+Not shown: 998 filtered tcp ports (no-response)
+PORT     STATE SERVICE
+135/tcp  open  msrpc
+2179/tcp open  vmrdp
+MAC Address: 08:8F:C3:C0:FF:EC (Compal Information (Kunshan))
+
+# Nmap done at Fri Jul 25 11:47:26 2025 -- 1 IP address (1 host up) scanned in 67.67 seconds

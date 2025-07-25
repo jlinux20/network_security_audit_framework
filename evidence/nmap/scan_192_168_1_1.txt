@@ -1,0 +1,29 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:38:33 2025 as: /usr/lib/nmap/nmap --privileged -sS -sV -sC -O --top-ports 1000 -T4 --max-retries 2 -oX evidence/nmap/scan_192_168_1_1.xml -oN evidence/nmap/scan_192_168_1_1.txt 192.168.1.1
+Nmap scan report for csp3.zte.com.cn (192.168.1.1)
+Host is up (0.0018s latency).
+Not shown: 996 closed tcp ports (reset)
+PORT    STATE SERVICE    VERSION
+23/tcp  open  telnet     ZTE F670L router telnetd
+53/tcp  open  domain     ISC BIND 9.11.5-P4-5.1+deb10u11 (Debian Linux)
+| dns-nsid: 
+|_  bind.version: 9.11.5-P4-5.1+deb10u11-Debian
+80/tcp  open  http       Mini web server 1.0 (ZTE ZXV10 W300 ADSL router http config)
+|_http-server-header: Mini web server 1.0 ZTE corp 2005.
+|_http-title: F670L
+443/tcp open  tcpwrapped
+|_http-server-header: Mini web server 1.0 ZTE corp 2005.
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=192.168.1.1/organizationName=ZTE/stateOrProvinceName=JiangSu/countryName=CN
+| Not valid before: 2016-07-13T01:32:15
+|_Not valid after:  2031-07-10T01:32:15
+|_http-title: 400 Bad Request
+MAC Address: EC:82:63:1A:6E:06 (zte)
+Device type: media device|general purpose
+Running: Google embedded, Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Google Home device, Linux 2.6.32 - 3.10
+Network Distance: 1 hop
+Service Info: OSs: Linux, Linux 2.4.17; Devices: router, broadband router; CPE: cpe:/h:zte:f670l, cpe:/o:linux:linux_kernel, cpe:/h:zte:zxv10_w300, cpe:/o:montavista:linux_kernel:2.4.17
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jul 25 11:38:51 2025 -- 1 IP address (1 host up) scanned in 18.20 seconds

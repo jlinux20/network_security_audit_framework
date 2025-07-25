@@ -1,0 +1,280 @@
+{
+  "scan_info": {
+    "timestamp": "2025-07-25 11:57:01",
+    "targets": {
+      "single_ip": "192.168.1.1",
+      "ip_range": "192.168.1.0/24",
+      "domain": "example.com",
+      "url": "https://example.com"
+    },
+    "scan_options": {
+      "port_range": "1-65535",
+      "top_ports": 1000,
+      "aggressive_scan": false,
+      "stealth_scan": true,
+      "service_detection": true,
+      "os_detection": true,
+      "vulnerability_scan": true,
+      "ssl_scan": true
+    },
+    "total_hosts": 9,
+    "total_vulnerabilities": 16
+  },
+  "hosts": [
+    "192.168.1.19",
+    "192.168.1.21",
+    "192.168.1.1",
+    "192.168.1.29",
+    "192.168.1.128",
+    "192.168.1.20",
+    "192.168.1.9",
+    "192.168.1.5",
+    "192.168.1.14"
+  ],
+  "port_scan_results": {
+    "192.168.1.19": {
+      "scan_file": "evidence/nmap/scan_192_168_1_19.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_19.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.21": {
+      "scan_file": "evidence/nmap/scan_192_168_1_21.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_21.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.1": {
+      "scan_file": "evidence/nmap/scan_192_168_1_1.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_1.txt",
+      "scan_completed": true,
+      "open_ports": [
+        {
+          "port": 23,
+          "service": "telnet",
+          "version": "ZTE F670L router telnetd"
+        },
+        {
+          "port": 53,
+          "service": "domain",
+          "version": "ISC BIND 9.11.5-P4-5.1+deb10u11 (Debian Linux)"
+        },
+        {
+          "port": 80,
+          "service": "http",
+          "version": "Mini web server 1.0 (ZTE ZXV10 W300 ADSL router http config)"
+        },
+        {
+          "port": 443,
+          "service": "tcpwrapped",
+          "version": "|_http-server-header: Mini web server 1.0 ZTE corp 2005."
+        }
+      ],
+      "os": "Google Home device, Linux 2.6.32 - 3.10"
+    },
+    "192.168.1.29": {
+      "scan_file": "evidence/nmap/scan_192_168_1_29.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_29.txt",
+      "scan_completed": true,
+      "open_ports": [
+        {
+          "port": 135,
+          "service": "msrpc",
+          "version": "Microsoft Windows RPC"
+        },
+        {
+          "port": 2179,
+          "service": "vmrdp?",
+          "version": "MAC Address: 08:8F:C3:C0:FF:EC (Compal Information (Kunshan))"
+        }
+      ]
+    },
+    "192.168.1.128": {
+      "scan_file": "evidence/nmap/scan_192_168_1_128.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_128.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.20": {
+      "scan_file": "evidence/nmap/scan_192_168_1_20.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_20.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.9": {
+      "scan_file": "evidence/nmap/scan_192_168_1_9.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_9.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.5": {
+      "scan_file": "evidence/nmap/scan_192_168_1_5.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_5.txt",
+      "scan_completed": true,
+      "open_ports": []
+    },
+    "192.168.1.14": {
+      "scan_file": "evidence/nmap/scan_192_168_1_14.xml",
+      "scan_file_txt": "evidence/nmap/scan_192_168_1_14.txt",
+      "scan_completed": true,
+      "open_ports": []
+    }
+  },
+  "service_analysis": {
+    "192.168.1.1": {
+      "web_80": {
+        "url": "http://192.168.1.1:80",
+        "status_code": 200,
+        "headers": {
+          "Server": "Mini web server 1.0 ZTE corp 2005.",
+          "Accept-Ranges": "bytes",
+          "Connection": "close",
+          "Content-Type": "text/html; charset=utf-8",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "1; mode=block",
+          "Content-Security-Policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:",
+          "Cache-Control": "no-cache,no-store",
+          "Content-Length": "37524",
+          "Set-Cookie": "_TESTCOOKIESUPPORT=1; PATH=/; HttpOnly",
+          "X-Frame-Options": "DENY"
+        },
+        "server": "Mini web server 1.0 ZTE corp 2005.",
+        "technologies": [],
+        "whatweb_file": "evidence/web/whatweb_192.168.1.1_80.txt"
+      },
+      "web_443": {
+        "url": "https://192.168.1.1:443",
+        "status_code": 200,
+        "headers": {
+          "Server": "Mini web server 1.0 ZTE corp 2005.",
+          "Accept-Ranges": "bytes",
+          "Connection": "close",
+          "Content-Type": "text/html; charset=utf-8",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "1; mode=block",
+          "Content-Security-Policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:",
+          "Cache-Control": "no-cache,no-store",
+          "Content-Length": "37524",
+          "Set-Cookie": "_TESTCOOKIESUPPORT=1; PATH=/; HttpOnly; Secure",
+          "X-Frame-Options": "DENY"
+        },
+        "server": "Mini web server 1.0 ZTE corp 2005.",
+        "technologies": [],
+        "whatweb_file": "evidence/web/whatweb_192.168.1.1_443.txt"
+      },
+      "ssl_443": {
+        "certificate": {},
+        "cipher": [
+          "AES256-GCM-SHA384",
+          "TLSv1.2",
+          256
+        ],
+        "tls_version": "TLSv1.2",
+        "subject": {},
+        "issuer": {},
+        "serial_number": null,
+        "not_before": null,
+        "not_after": null,
+        "testssl_file": "evidence/ssl/testssl_192.168.1.1_443.txt"
+      }
+    }
+  },
+  "vulnerabilities": [
+    {
+      "host": "192.168.1.19",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:41:15"
+    },
+    {
+      "host": "192.168.1.21",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:42:25"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:42"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|   VULNERABLE:",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:42"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|     IDs:  BID:70574  CVE:CVE-2014-3566",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:42"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|       https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-3566",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:42"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|       CBC-mode cipher in SSLv3 (CVE-2014-3566)",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:59"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|   VULNERABLE:",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:59"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|     IDs:  BID:70574  CVE:CVE-2014-3566",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:59"
+    },
+    {
+      "host": "192.168.1.1",
+      "description": "|       https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-3566",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:45:59"
+    },
+    {
+      "host": "192.168.1.29",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:47:26"
+    },
+    {
+      "host": "192.168.1.128",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:49:23"
+    },
+    {
+      "host": "192.168.1.20",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:50:02"
+    },
+    {
+      "host": "192.168.1.9",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:51:05"
+    },
+    {
+      "host": "192.168.1.5",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:54:57"
+    },
+    {
+      "host": "192.168.1.14",
+      "description": "|   After NULL UDP avahi packet DoS (CVE-2011-1002).",
+      "severity": "Unknown",
+      "timestamp": "2025-07-25 11:55:43"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:49:25 2025 as: /usr/lib/nmap/nmap --privileged --script ssh-* -oN evidence/vulnerabilities/vulns_192_168_1_128.txt_ssh-all 192.168.1.128
+Nmap scan report for kali (192.168.1.128)
+Host is up (0.0000070s latency).
+All 1000 scanned ports on kali (192.168.1.128) are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+
+# Nmap done at Fri Jul 25 11:49:26 2025 -- 1 IP address (1 host up) scanned in 0.32 seconds

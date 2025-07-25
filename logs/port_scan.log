@@ -1,0 +1,18 @@
+[2025-07-24 18:29:29] Nmap scan 192.168.1.1: Completado - evidence/nmap/scan_192_168_1_1.xml
+[2025-07-24 18:55:05] Masscan 192.168.1.1: Masscan no disponible
+[2025-07-24 18:55:05] Nmap scan 192.168.1.1: Timeout
+[2025-07-24 18:55:05] Nmap scan 192.168.1.1: Completado - evidence/nmap/scan_192_168_1_1.xml
+[2025-07-24 18:56:13] Masscan 192.168.1.1: Masscan no disponible
+[2025-07-24 18:56:13] Nmap scan 192.168.1.1: Timeout
+[2025-07-24 18:56:33] Masscan 192.168.1.1: Masscan no disponible
+[2025-07-24 18:56:33] Nmap scan 192.168.1.1: Timeout
+[2025-07-24 18:56:33] Nmap scan 192.168.1.1: Completado - evidence/nmap/scan_192_168_1_1.xml
+[2025-07-25 11:38:27] Nmap scan 192.168.1.19: Completado - evidence/nmap/scan_192_168_1_19.xml
+[2025-07-25 11:38:32] Nmap scan 192.168.1.21: Completado - evidence/nmap/scan_192_168_1_21.xml
+[2025-07-25 11:38:51] Nmap scan 192.168.1.1: Completado - evidence/nmap/scan_192_168_1_1.xml
+[2025-07-25 11:39:37] Nmap scan 192.168.1.29: Completado - evidence/nmap/scan_192_168_1_29.xml
+[2025-07-25 11:39:41] Nmap scan 192.168.1.128: Completado - evidence/nmap/scan_192_168_1_128.xml
+[2025-07-25 11:39:46] Nmap scan 192.168.1.20: Completado - evidence/nmap/scan_192_168_1_20.xml
+[2025-07-25 11:39:49] Nmap scan 192.168.1.9: Completado - evidence/nmap/scan_192_168_1_9.xml
+[2025-07-25 11:39:59] Nmap scan 192.168.1.5: Completado - evidence/nmap/scan_192_168_1_5.xml
+[2025-07-25 11:40:24] Nmap scan 192.168.1.14: Completado - evidence/nmap/scan_192_168_1_14.xml

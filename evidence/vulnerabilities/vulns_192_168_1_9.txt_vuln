@@ -1,0 +1,14 @@
+# Nmap 7.95 scan initiated Fri Jul 25 11:50:26 2025 as: /usr/lib/nmap/nmap --privileged --script vuln -oN evidence/vulnerabilities/vulns_192_168_1_9.txt_vuln 192.168.1.9
+Pre-scan script results:
+| broadcast-avahi-dos: 
+|   Discovered hosts:
+|     224.0.0.251
+|   After NULL UDP avahi packet DoS (CVE-2011-1002).
+|_  Hosts are all up (not vulnerable).
+Nmap scan report for k61 (192.168.1.9)
+Host is up (0.018s latency).
+All 1000 scanned ports on k61 (192.168.1.9) are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: 00:08:22:70:7A:E6 (InPro Comm)
+
+# Nmap done at Fri Jul 25 11:51:04 2025 -- 1 IP address (1 host up) scanned in 38.51 seconds
