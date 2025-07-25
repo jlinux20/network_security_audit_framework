@@ -1000,13 +1000,14 @@ Reporte generado por Network Security Audit Framework
 # ================================
 
 class NetworkSecurityAuditor:
-    def __init__(self, target, scan_type, config_file="audit_config.json"):
+    def __init__(self, target, scan_type, save_reports=False, config_file="audit_config.json"):
         print("🛡️ Iniciando Network Security Audit Framework...")
         print("=" * 60)
         
         self.config = Config(config_file)
         self.target = target
         self.scan_type = scan_type
+        self.save_reports = save_reports
         
         # Inicializar módulos
         self.host_discovery = HostDiscovery(self.config)
@@ -1054,7 +1055,7 @@ class NetworkSecurityAuditor:
         self.service_results = self.service_analyzer.analyze_services(self.port_results)
         self.vulnerabilities = self.service_analyzer.vulnerabilities
         
-        # FASE 4: Generación de reportes
+        # FASE 4: Generación de reportes (solo si se solicita)
         print("\n📋 FASE 4: GENERACIÓN DE REPORTES")
         print("-" * 40)
         
@@ -1066,7 +1067,11 @@ class NetworkSecurityAuditor:
             self.target
         )
         
-        report_files = self.reporter.generate_all_reports()
+        report_files = []
+        if self.save_reports:
+            report_files = self.reporter.generate_all_reports()
+        else:
+            print("\n[INFO] Ejecución tipo nmap: solo mostrando resultados en pantalla. Para guardar reportes use --save.")
         
         # Resumen final
         end_time = time.time()
@@ -1079,14 +1084,15 @@ class NetworkSecurityAuditor:
         print(f"🎯 Hosts analizados: {len(self.live_hosts)}")
         print(f"🔓 Puertos abiertos: {sum(len(host_data.get('open_ports', [])) for host_data in self.port_results.values())}")
         print(f"⚠️  Vulnerabilidades: {len(self.vulnerabilities)}")
-        print(f"📋 Reportes generados: {len(report_files)}")
-        
-        print("\n📁 ARCHIVOS GENERADOS:")
-        for report_file in report_files:
-            print(f"   📄 {report_file}")
-        
-        print(f"\n📂 Evidencias detalladas en: evidence/")
-        print(f"📝 Logs en: logs/")
+        if self.save_reports:
+            print(f"📋 Reportes generados: {len(report_files)}")
+            print("\n📁 ARCHIVOS GENERADOS:")
+            for report_file in report_files:
+                print(f"   📄 {report_file}")
+            print(f"\n📂 Evidencias detalladas en: evidence/")
+            print(f"📝 Logs en: logs/")
+        else:
+            print("\n[INFO] No se guardaron reportes. Solo se muestran resultados en pantalla.")
         
         # Mostrar vulnerabilidades críticas si las hay
         critical_vulns = [v for v in self.vulnerabilities if v.get("severity") == "Critical"]
@@ -1153,9 +1159,10 @@ def main():
     print("👨‍💼 Para administradores de redes y comunicaciones")
     print()
     
-    if len(sys.argv) > 1:
-        # ... (manejo de argumentos como --create-config, etc.)
-        pass
+    # Analizar argumentos para --save
+    save_reports = False
+    if any(arg in ["--save", "-s"] for arg in sys.argv):
+        save_reports = True
     
     # Validar entorno y configuración
     if not validate_environment() or not os.path.exists("audit_config.json"):
@@ -1190,7 +1197,7 @@ def main():
 
     try:
         # Iniciar auditoría con el objetivo seleccionado
-        auditor = NetworkSecurityAuditor(target=target, scan_type=scan_type)
+        auditor = NetworkSecurityAuditor(target=target, scan_type=scan_type, save_reports=save_reports)
         results = auditor.run_comprehensive_audit()
         
     except KeyboardInterrupt:
