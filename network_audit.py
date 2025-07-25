@@ -309,63 +309,87 @@ class PortScanner:
         nmap_cmd.extend(["-T4", "--max-retries", "2"])
         
         # Output
-        output_file = f"evidence/nmap/scan_{host.replace('.', '_')}.xml"
-        output_file_txt = f"evidence/nmap/scan_{host.replace('.', '_')}.txt"
+        xml_output_file = f"evidence/nmap/scan_{host.replace('.', '_')}.xml"
+        txt_output_file = f"evidence/nmap/scan_{host.replace('.', '_')}.txt"
         
-        nmap_cmd.extend(["-oX", output_file, "-oN", output_file_txt])
+        nmap_cmd.extend(["-oX", xml_output_file, "-oN", txt_output_file])
         nmap_cmd.append(host)
         
         try:
             print(f"Ejecutando: {' '.join(nmap_cmd)}")
-            result = subprocess.run(
+            subprocess.run(
                 nmap_cmd,
                 capture_output=True,
                 text=True,
-                timeout=self.config.get("timing", {}).get("timeout", 300)
+                timeout=self.config.get("timing", {}).get("timeout", 300),
+                check=True
             )
             
             self.results[host] = {
-                "scan_file": output_file,
-                "scan_file_txt": output_file_txt,
+                "scan_file_xml": xml_output_file,
+                "scan_file_txt": txt_output_file,
                 "scan_completed": True
             }
             
-            # Parsear resultados básicos
-            self.parse_nmap_output(host, result.stdout)
+            # Parsear resultados desde el XML
+            self._parse_xml_output(host, xml_output_file)
             
-            self.log_action(f"Nmap scan {host}", f"Completado - {output_file}")
+            self.log_action(f"Nmap scan {host}", f"Completado - {xml_output_file}")
             
         except subprocess.TimeoutExpired:
             self.log_action(f"Nmap scan {host}", "Timeout")
             self.results[host] = {"scan_completed": False, "error": "Timeout"}
+        except subprocess.CalledProcessError as e:
+            self.log_action(f"Nmap scan {host}", f"Error: {e.stderr}")
+            self.results[host] = {"scan_completed": False, "error": e.stderr}
         except Exception as e:
             self.log_action(f"Nmap scan {host}", f"Error: {str(e)}")
             self.results[host] = {"scan_completed": False, "error": str(e)}
-    
-    def parse_nmap_output(self, host, output):
-        """Parsear salida de Nmap para extraer información básica"""
+
+    def _parse_xml_output(self, host, xml_file):
+        """Parsear el output XML de Nmap para extraer información detallada."""
         if host not in self.results:
             self.results[host] = {}
         
-        # Extraer puertos abiertos
-        port_pattern = r'(\d+)/tcp\s+open\s+(\S+)(?:\s+(.+))?'
-        ports = re.findall(port_pattern, output)
-        
         self.results[host]["open_ports"] = []
-        for port, service, version in ports:
-            port_info = {
-                "port": int(port),
-                "service": service,
-                "version": version.strip() if version else ""
-            }
-            self.results[host]["open_ports"].append(port_info)
         
-        # Extraer OS
-        os_pattern = r'OS details: (.+)'
-        os_match = re.search(os_pattern, output)
-        if os_match:
-            self.results[host]["os"] = os_match.group(1)
-    
+        try:
+            import xml.etree.ElementTree as ET
+            tree = ET.parse(xml_file)
+            root = tree.getroot()
+            
+            host_node = root.find("host")
+            if host_node is None:
+                return
+
+            # Extraer puertos abiertos
+            ports_node = host_node.find("ports")
+            if ports_node:
+                for port_elem in ports_node.findall("port"):
+                    state_elem = port_elem.find("state")
+                    if state_elem is not None and state_elem.get("state") == "open":
+                        service_elem = port_elem.find("service")
+                        port_info = {
+                            "port": int(port_elem.get("portid")),
+                            "service": service_elem.get("name", "unknown") if service_elem is not None else "unknown",
+                            "product": service_elem.get("product", "") if service_elem is not None else "",
+                            "version": service_elem.get("version", "") if service_elem is not None else "",
+                            "extrainfo": service_elem.get("extrainfo", "") if service_elem is not None else ""
+                        }
+                        self.results[host]["open_ports"].append(port_info)
+
+            # Extraer información del Sistema Operativo
+            os_node = host_node.find("os")
+            if os_node:
+                osmatch_elem = os_node.find("osmatch")
+                if osmatch_elem is not None:
+                    self.results[host]["os"] = osmatch_elem.get("name", "Unknown")
+
+        except ET.ParseError as e:
+            self.log_action(f"XML Parse Error {host}", f"Failed to parse {xml_file}: {e}")
+        except FileNotFoundError:
+            self.log_action(f"XML Parse Error {host}", f"File not found: {xml_file}")
+
     def masscan_fast_scan(self, host):
         """Escaneo rápido con Masscan (si está disponible)"""
         print(f"⚡ Escaneo rápido con Masscan: {host}...")
