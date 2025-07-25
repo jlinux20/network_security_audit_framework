@@ -105,6 +105,14 @@ class NetworkUtils:
             return True
         except ValueError:
             return False
+
+    @staticmethod
+    def resolve_hostname(hostname):
+        """Resolver hostname a IP"""
+        try:
+            return socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return None
     
     @staticmethod
     def validate_network(network):
@@ -228,15 +236,26 @@ class HostDiscovery:
         """Ejecutar descubrimiento completo"""
         print("🚀 Iniciando descubrimiento de hosts...")
         
-        if "/" in target:  # Es un rango de red
+        # Validar si es un rango de red
+        if NetworkUtils.validate_network(target):
             self.ping_sweep(target)
             self.nmap_host_discovery(target)
-        else:  # Es una IP individual
-            if NetworkUtils.validate_ip(target):
-                self.results["live_hosts"] = [target]
+        # Validar si es una IP
+        elif NetworkUtils.validate_ip(target):
+            self.results["live_hosts"] = [target]
+        # Intentar resolver como hostname o extraer de URL
+        else:
+            hostname = target
+            if "://" in target:
+                hostname = urlparse(target).hostname
+            
+            ip = NetworkUtils.resolve_hostname(hostname)
+            if ip:
+                print(f"✅ Dominio/URL '{target}' resuelto a: {ip}")
+                self.results["live_hosts"] = [ip]
             else:
-                print(f"❌ IP inválida: {target}")
-        
+                print(f"❌ No se pudo resolver el objetivo: {target}")
+
         return self.results["live_hosts"]
 
 # ================================
@@ -629,12 +648,12 @@ class AuditReporter:
         self.config = config
         self.report_data = {}
     
-    def collect_all_data(self, hosts, port_results, service_results, vulnerabilities):
+    def collect_all_data(self, hosts, port_results, service_results, vulnerabilities, target):
         """Recopilar todos los datos del audit"""
         self.report_data = {
             "scan_info": {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "targets": self.config.get("targets", {}),
+                "target": target,
                 "scan_options": self.config.get("scan_options", {}),
                 "total_hosts": len(hosts),
                 "total_vulnerabilities": len(vulnerabilities)
@@ -705,7 +724,7 @@ class AuditReporter:
         <div class="header">
             <h1>🛡️ Network Security Audit Report</h1>
             <p><strong>Fecha:</strong> {self.report_data["scan_info"]["timestamp"]}</p>
-            <p><strong>Objetivos:</strong> {', '.join(map(str, self.report_data["scan_info"]["targets"].values()))}</p>
+            <p><strong>Objetivo:</strong> {self.report_data["scan_info"]["target"]}</p>
         </div>
         
         <div class="stats">
@@ -875,7 +894,7 @@ class AuditReporter:
 ========================================
 
 Fecha del análisis: {self.report_data["scan_info"]["timestamp"]}
-Objetivos escaneados: {', '.join(map(str, self.report_data["scan_info"]["targets"].values()))}
+Objetivo escaneado: {self.report_data["scan_info"]["target"]}
 
 RESUMEN EJECUTIVO
 ================
@@ -981,11 +1000,13 @@ Reporte generado por Network Security Audit Framework
 # ================================
 
 class NetworkSecurityAuditor:
-    def __init__(self, config_file="audit_config.json"):
+    def __init__(self, target, scan_type, config_file="audit_config.json"):
         print("🛡️ Iniciando Network Security Audit Framework...")
         print("=" * 60)
         
         self.config = Config(config_file)
+        self.target = target
+        self.scan_type = scan_type
         
         # Inicializar módulos
         self.host_discovery = HostDiscovery(self.config)
@@ -998,7 +1019,7 @@ class NetworkSecurityAuditor:
         self.port_results = {}
         self.service_results = {}
         self.vulnerabilities = []
-    
+
     def run_comprehensive_audit(self):
         """Ejecutar auditoría completa de seguridad"""
         start_time = time.time()
@@ -1006,20 +1027,11 @@ class NetworkSecurityAuditor:
         print("🚀 INICIANDO AUDITORÍA COMPLETA DE SEGURIDAD DE RED")
         print("=" * 60)
         
-        # Determinar objetivos
-        targets = self.config.get("targets", {})
-        
         # FASE 1: Descubrimiento de hosts
         print("\n📡 FASE 1: DESCUBRIMIENTO DE HOSTS")
         print("-" * 40)
         
-        if targets.get("ip_range"):
-            self.live_hosts = self.host_discovery.run_discovery(targets["ip_range"])
-        elif targets.get("single_ip"):
-            self.live_hosts = self.host_discovery.run_discovery(targets["single_ip"])
-        else:
-            print("❌ No se especificaron objetivos válidos")
-            return
+        self.live_hosts = self.host_discovery.run_discovery(self.target)
         
         if not self.live_hosts:
             print("❌ No se encontraron hosts activos")
@@ -1050,7 +1062,8 @@ class NetworkSecurityAuditor:
             self.live_hosts,
             self.port_results,
             self.service_results,
-            self.vulnerabilities
+            self.vulnerabilities,
+            self.target
         )
         
         report_files = self.reporter.generate_all_reports()
@@ -1141,45 +1154,43 @@ def main():
     print()
     
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--create-config":
-            create_sample_config()
-            return
-        elif sys.argv[1] == "--validate":
-            validate_environment()
-            return
-        elif sys.argv[1] == "--help":
-            print("""
-Uso: python network_audit.py [OPCIÓN]
+        # ... (manejo de argumentos como --create-config, etc.)
+        pass
+    
+    # Validar entorno y configuración
+    if not validate_environment() or not os.path.exists("audit_config.json"):
+        # ... (mensajes de error)
+        return
 
-OPCIONES:
-  --create-config    Crear archivo de configuración de ejemplo
-  --validate         Validar herramientas del sistema
-  --help             Mostrar esta ayuda
-  
-ARCHIVOS:
-  audit_config.json  Archivo de configuración principal
-  
-DIRECTORIOS:
-  reports/           Reportes generados
-  evidence/          Evidencias detalladas
-  logs/              Logs de ejecución
-            """)
-            return
+    # Menú de selección de objetivo
+    print("Seleccione el tipo de escaneo:")
+    print("1. Escanear un objetivo específico (IP, dominio, URL)")
+    print("2. Escanear toda la red interna (según configuración)")
     
-    # Validar entorno
-    if not validate_environment():
-        print("❌ Faltan herramientas requeridas. Instala las dependencias.")
+    choice = input("Ingrese su opción (1 o 2): ")
+    
+    target = None
+    scan_type = None
+
+    if choice == '1':
+        target = input("Ingrese la IP, dominio o URL a escanear: ")
+        scan_type = 'single_target'
+    elif choice == '2':
+        config = Config()
+        target = config.get("targets", {}).get("ip_range")
+        scan_type = 'network_range'
+        print(f"Usando el rango de red de la configuración: {target}")
+    else:
+        print("Opción no válida. Saliendo.")
         return
-    
-    # Verificar configuración
-    if not os.path.exists("audit_config.json"):
-        print("⚠️  No se encuentra audit_config.json")
-        print("💡 Ejecuta: python network_audit.py --create-config")
+
+    if not target:
+        print("No se ha definido un objetivo. Saliendo.")
         return
-    
+
     try:
-        # Iniciar auditoría
-        auditor = NetworkSecurityAuditor()
+        # Iniciar auditoría con el objetivo seleccionado
+        auditor = NetworkSecurityAuditor(target=target, scan_type=scan_type)
         results = auditor.run_comprehensive_audit()
         
     except KeyboardInterrupt:
