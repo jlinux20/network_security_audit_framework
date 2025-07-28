@@ -364,7 +364,7 @@ class PortScanner:
 
             # Extraer puertos abiertos
             ports_node = host_node.find("ports")
-            if ports_node:
+            if ports_node is not None:
                 for port_elem in ports_node.findall("port"):
                     state_elem = port_elem.find("state")
                     if state_elem is not None and state_elem.get("state") == "open":
@@ -374,13 +374,14 @@ class PortScanner:
                             "service": service_elem.get("name", "unknown") if service_elem is not None else "unknown",
                             "product": service_elem.get("product", "") if service_elem is not None else "",
                             "version": service_elem.get("version", "") if service_elem is not None else "",
-                            "extrainfo": service_elem.get("extrainfo", "") if service_elem is not None else ""
+                            "extrainfo": service_elem.get("extrainfo", "") if service_elem is not None else "",
+                            "banner": service_elem.get("banner", "") if service_elem is not None and service_elem.get("banner") else ""
                         }
                         self.results[host]["open_ports"].append(port_info)
 
             # Extraer información del Sistema Operativo
             os_node = host_node.find("os")
-            if os_node:
+            if os_node is not None:
                 osmatch_elem = os_node.find("osmatch")
                 if osmatch_elem is not None:
                     self.results[host]["os"] = osmatch_elem.get("name", "Unknown")
@@ -463,9 +464,18 @@ class ServiceAnalyzer:
                     "status_code": response.status_code,
                     "headers": dict(response.headers),
                     "server": response.headers.get('Server', ''),
-                    "technologies": []
+                    "technologies": [],
+                    "html_title": re.search(r'<title>(.*?)</title>', response.text, re.IGNORECASE).group(1) if "<title>" in response.text else "",
+                    "content_length": response.headers.get('Content-Length', ''),
+                    "evidence_file": None
                 }
                 
+                # Guardar respuesta HTML como evidencia
+                evidence_file = f"evidence/web/response_{host}_{port}.html"
+                with open(evidence_file, "w", encoding="utf-8") as f:
+                    f.write(response.text)
+                web_info["evidence_file"] = evidence_file
+
                 # Detectar tecnologías por headers
                 server_header = response.headers.get('Server', '').lower()
                 x_powered_by = response.headers.get('X-Powered-By', '').lower()
@@ -564,9 +574,16 @@ class ServiceAnalyzer:
                         "issuer": dict(x[0] for x in cert.get('issuer', [])),
                         "serial_number": cert.get('serialNumber'),
                         "not_before": cert.get('notBefore'),
-                        "not_after": cert.get('notAfter')
+                        "not_after": cert.get('notAfter'),
+                        "evidence_file": None
                     }
                     
+                    # Guardar certificado como evidencia
+                    evidence_file = f"evidence/ssl/cert_{host}_{port}.txt"
+                    with open(evidence_file, "w") as f:
+                        f.write(str(cert))
+                    ssl_info["evidence_file"] = evidence_file
+
                     # Testssl.sh si está disponible
                     testssl_file = f"evidence/ssl/testssl_{host}_{port}.txt"
                     testssl_cmd = f"testssl.sh --quiet {host}:{port}"
@@ -851,6 +868,7 @@ class AuditReporter:
                         <th>Puerto</th>
                         <th>Servicio</th>
                         <th>Versión</th>
+                        <th>Banner</th>
                         <th>Estado</th>
                     </tr>
                 </thead>
@@ -863,6 +881,7 @@ class AuditReporter:
                         <td>{port_info['port']}</td>
                         <td>{port_info['service']}</td>
                         <td>{port_info.get('version', 'N/A')}</td>
+                        <td>{port_info.get('banner', '')}</td>
                         <td>Abierto</td>
                     </tr>
                     """
@@ -880,7 +899,12 @@ class AuditReporter:
                     <strong>URL:</strong> {web_info['url']}<br>
                     <strong>Servidor:</strong> {web_info.get('server', 'N/A')}<br>
                     <strong>Estado:</strong> {web_info['status_code']}<br>
-                    <strong>Tecnologías:</strong> {', '.join(web_info.get('technologies', ['N/A']))}
+                    <strong>Tecnologías:</strong> {', '.join(web_info.get('technologies', ['N/A']))}<br>
+                    <strong>Título HTML:</strong> {web_info.get('html_title', '')}<br>
+                    <strong>Content-Length:</strong> {web_info.get('content_length', '')}<br>
+                    <strong>Headers:</strong> <pre>{json.dumps(web_info.get('headers', {}), indent=2)}</pre>
+                    <strong>Evidencia HTML:</strong> <a href="../{web_info.get('evidence_file', '')}" target="_blank">Ver archivo</a>
+                    <strong>WhatWeb:</strong> <a href="../{web_info.get('whatweb_file', '')}" target="_blank">Ver archivo</a>
                 </div>
                 """
             
@@ -894,8 +918,11 @@ class AuditReporter:
                 <div class="service-info">
                     <strong>Versión TLS:</strong> {ssl_info.get('tls_version', 'N/A')}<br>
                     <strong>Emisor:</strong> {ssl_info.get('issuer', {}).get('organizationName', 'N/A')}<br>
+                    <strong>Válido desde:</strong> {ssl_info.get('not_before', 'N/A')}<br>
                     <strong>Válido hasta:</strong> {ssl_info.get('not_after', 'N/A')}<br>
-                    <strong>Cipher:</strong> {ssl_info.get('cipher', ['N/A'])[0] if ssl_info.get('cipher') else 'N/A'}
+                    <strong>Cipher:</strong> {ssl_info.get('cipher', ['N/A'])[0] if ssl_info.get('cipher') else 'N/A'}<br>
+                    <strong>Evidencia Certificado:</strong> <a href="../{ssl_info.get('evidence_file', '')}" target="_blank">Ver archivo</a>
+                    <strong>TestSSL:</strong> <a href="../{ssl_info.get('testssl_file', '')}" target="_blank">Ver archivo</a>
                 </div>
                 """
             
@@ -996,7 +1023,37 @@ DETALLES POR HOST
                     report_content += f"  - {port_info['port']}/tcp - {port_info['service']}"
                     if port_info.get('version'):
                         report_content += f" ({port_info['version']})"
+                    if port_info.get('banner'):
+                        report_content += f" [Banner: {port_info['banner']}]"
                     report_content += "\n"
+            
+            # Servicios web
+            web_services = [k for k in service_data.keys() if k.startswith('web_')]
+            if web_services:
+                report_content += "\nServicios Web:\n"
+                for web_service in web_services:
+                    web_info = service_data[web_service]
+                    report_content += f"  - URL: {web_info['url']}\n"
+                    report_content += f"    Estado: {web_info['status_code']}\n"
+                    report_content += f"    Tecnologías: {', '.join(web_info.get('technologies', ['N/A']))}\n"
+                    report_content += f"    Título HTML: {web_info.get('html_title', '')}\n"
+                    report_content += f"    Headers: {json.dumps(web_info.get('headers', {}), indent=2)}\n"
+                    report_content += f"    Evidencia HTML: {web_info.get('evidence_file', '')}\n"
+                    report_content += f"    WhatWeb: {web_info.get('whatweb_file', '')}\n"
+            
+            # Servicios SSL
+            ssl_services = [k for k in service_data.keys() if k.startswith('ssl_')]
+            if ssl_services:
+                report_content += "\nServicios SSL/TLS:\n"
+                for ssl_service in ssl_services:
+                    ssl_info = service_data[ssl_service]
+                    report_content += f"  - TLS Version: {ssl_info.get('tls_version', 'N/A')}\n"
+                    report_content += f"    Emisor: {ssl_info.get('issuer', {}).get('organizationName', 'N/A')}\n"
+                    report_content += f"    Válido desde: {ssl_info.get('not_before', 'N/A')}\n"
+                    report_content += f"    Válido hasta: {ssl_info.get('not_after', 'N/A')}\n"
+                    report_content += f"    Cipher: {ssl_info.get('cipher', ['N/A'])[0] if ssl_info.get('cipher') else 'N/A'}\n"
+                    report_content += f"    Evidencia Certificado: {ssl_info.get('evidence_file', '')}\n"
+                    report_content += f"    TestSSL: {ssl_info.get('testssl_file', '')}\n"
             
             # Vulnerabilidades específicas del host
             host_vulns = [v for v in self.report_data["vulnerabilities"] if v["host"] == host]

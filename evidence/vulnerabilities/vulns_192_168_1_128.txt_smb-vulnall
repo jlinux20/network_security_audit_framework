@@ -1,7 +1,0 @@
-# Nmap 7.95 scan initiated Fri Jul 25 11:49:24 2025 as: /usr/lib/nmap/nmap --privileged --script smb-vuln* -oN evidence/vulnerabilities/vulns_192_168_1_128.txt_smb-vulnall 192.168.1.128
-Nmap scan report for kali (192.168.1.128)
-Host is up (0.000016s latency).
-All 1000 scanned ports on kali (192.168.1.128) are in ignored states.
-Not shown: 1000 closed tcp ports (reset)
-
-# Nmap done at Fri Jul 25 11:49:24 2025 -- 1 IP address (1 host up) scanned in 0.35 seconds
