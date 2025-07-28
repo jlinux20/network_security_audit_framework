@@ -497,7 +497,41 @@ class ServiceAnalyzer:
                     
                 except:
                     pass
-                
+
+                # Nikto automático
+                nikto_file = f"evidence/web/nikto_{host}_{port}.txt"
+                nikto_cmd = f"nikto -host {host} -port {port} -output {nikto_file} -Format txt -nointeractive"
+                nikto_findings = []
+                try:
+                    nikto_result = subprocess.run(
+                        nikto_cmd,
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=180
+                    )
+                    # Guardar salida si no se guardó correctamente
+                    if not os.path.exists(nikto_file):
+                        with open(nikto_file, "w") as f:
+                            f.write(nikto_result.stdout)
+                    # Parsear hallazgos relevantes
+                    for line in nikto_result.stdout.splitlines():
+                        if line.strip().startswith("+") and ("OSVDB" in line or "Server" in line or "Vulnerable" in line or "XSS" in line or "SQL" in line or "Directory indexing" in line or "injection" in line or "cookie" in line or "admin" in line or "password" in line):
+                            nikto_findings.append(line.strip())
+                    web_info["nikto_file"] = nikto_file
+                    web_info["nikto_findings"] = nikto_findings
+                    # Agregar hallazgos de Nikto a vulnerabilidades globales
+                    for finding in nikto_findings:
+                        vuln_info = {
+                            "host": host,
+                            "description": f"Nikto: {finding}",
+                            "severity": "Medium" if ("XSS" in finding or "SQL" in finding or "Vulnerable" in finding) else "Low",
+                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        }
+                        self.vulnerabilities.append(vuln_info)
+                except Exception as e:
+                    self.log_action(f"Nikto analysis {host}:{port}", f"Error: {str(e)}")
+
                 if host not in self.results:
                     self.results[host] = {}
                 self.results[host][f"web_{port}"] = web_info
