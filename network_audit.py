@@ -364,7 +364,7 @@ class PortScanner:
 
             # Extraer puertos abiertos
             ports_node = host_node.find("ports")
-            if ports_node:
+            if ports_node is not None:
                 for port_elem in ports_node.findall("port"):
                     state_elem = port_elem.find("state")
                     if state_elem is not None and state_elem.get("state") == "open":
@@ -380,7 +380,7 @@ class PortScanner:
 
             # Extraer información del Sistema Operativo
             os_node = host_node.find("os")
-            if os_node:
+            if os_node is not None:
                 osmatch_elem = os_node.find("osmatch")
                 if osmatch_elem is not None:
                     self.results[host]["os"] = osmatch_elem.get("name", "Unknown")
